@@ -1,0 +1,29 @@
+---
+- name: Ansible rest and tags
+  hosts: localhost
+  gather_facts: no
+
+  vars: 
+    myrsakey: "{{ lookup('file', '/home/student/.ssh/id_rsa.pub') }}"
+    astros: "{{ lookup('url', 'http://api.open-notify.org/astros.json')  }}"
+
+  tasks: 
+    - name: Key prep
+      debug: 
+        msg: "Your RSA key is {{ myrsakey }}"
+        ## the below section was added for roles. The above grabs rsa key
+      tags:
+        - keytime
+        - vmprep 
+
+    - name: show astros ans cosmos on ISS
+      debug:
+        msg: "Today on the ISS are: {{ astros.people }}"
+      tags:
+        - jsonwork
+        - astros
+
+    - name: clean up that ISS data
+      debug:
+        msg: "Currently in space: {{ item }}"
+      loop: "{{ astros.people|map(attribute='name')|list }}"
